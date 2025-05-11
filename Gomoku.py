@@ -95,12 +95,62 @@ class Gomoku:
                         return True
         return False
 
+    def has_open_four(self, player):
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.board[row][col] != player:
+                    continue
+                for dr, dc in self.directions:
+                    count = 1
+                    blocked_ends = 0
+                    for k in range(1, 5):
+                        r, c = row + dr * k, col + dc * k
+                        if 0 <= r < self.size and 0 <= c < self.size:
+                            if self.board[r][c] == player:
+                                count += 1
+                            elif self.board[r][c] != 0:
+                                blocked_ends += 1
+                                break
+                            else:
+                                break
+                        else:
+                            blocked_ends += 1
+                            break
+                    for k in range(1, 5):
+                        r, c = row - dr * k, col - dc * k
+                        if 0 <= r < self.size and 0 <= c < self.size:
+                            if self.board[r][c] == player:
+                                count += 1
+                            elif self.board[r][c] != 0:
+                                blocked_ends += 1
+                                break
+                            else:
+                                break
+                        else:
+                            blocked_ends += 1
+                            break
+                    if count == 4 and blocked_ends == 0:
+                        return True
+        return False
+
+    def create_open_four(self, player):
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.board[row][col] != 0:
+                    continue
+                self.board[row][col] = player
+                if self.has_open_four(player):
+                    self.board[row][col] = 0
+                    return (row, col)
+                self.board[row][col] = 0
+        return None
+
     def block_open_three(self, player):
         for row in range(self.size):
             for col in range(self.size):
                 if self.board[row][col] != 0:
                     continue
-                self.board[row][col] = 2  # AI tries to block
+                self.board[row][col] = 2
                 if not self.has_open_three(player):
                     self.board[row][col] = 0
                     return (row, col)
@@ -145,7 +195,7 @@ class Gomoku:
                     if count >= 5:
                         score += 1000000
                     elif count == 4 and blocked == 0:
-                        score += 100000
+                        score += 2000000  # Increased to prioritize creating open four
                     elif count == 4 and blocked == 1:
                         score += 1000
                     elif count == 3 and blocked == 0:
@@ -165,7 +215,7 @@ class Gomoku:
                 return -10000000
             else:
                 return 10000000
-        if self.has_open_three(1):  # Always penalize player's open three
+        if self.has_open_three(1):
             return ai_score - player_score - 750000
         return ai_score - player_score
 
@@ -226,6 +276,10 @@ class Gomoku:
         threat = self.check_immediate_threat(1)
         if threat:
             return threat
+        # Check if AI can create an open four (leads to a guaranteed win)
+        open_four_move = self.create_open_four(2)
+        if open_four_move:
+            return open_four_move
         # Check if player has an open three and block it
         if self.has_open_three(1):
             block_move = self.block_open_three(1)
