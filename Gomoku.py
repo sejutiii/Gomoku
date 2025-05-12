@@ -314,7 +314,7 @@ class GomokuGame:
         self.restart_button = pygame.Rect(self.screen_width - 120, self.screen_height - 80, 100, 40)
 
     def draw_board(self):
-        self.screen.fill((255, 255, 255))
+        self.screen.fill((155, 155, 155))
         for i in range(self.game.size):
             pygame.draw.line(self.screen, (0, 0, 0),
                              (0, i * self.cell_size), (self.board_size, i * self.cell_size), 2)
@@ -363,10 +363,12 @@ class GomokuGame:
 
     def ai_move(self):
         start_time = time.time()
+       ## time.sleep(1.5)
         move = self.game.find_best_move(depth=2)
         end_time = time.time()
         if move:
             row, col = move
+            
             self.game.make_move(row, col, 2)
             self.status = f"Player's Turn (AI moved in {end_time - start_time:.2f}s)"
             if self.game.check_winner(2):
