@@ -304,7 +304,7 @@ class Gomoku:
                     break
             return min_eval
 
-    def find_best_move(self, depth=2):
+    def find_best_move(self, depth = 4):
         # Check if AI can win immediately
         ai_win = self.check_immediate_threat(2)
         if ai_win:
@@ -378,33 +378,41 @@ class GomokuGame:
         self.screen.blit(restart_text, (self.restart_button.x + 10, self.restart_button.y + 10))
 
     def handle_click(self, pos):
-        if self.game.game_over:
-            if self.restart_button.collidepoint(pos):
-                self.game = Gomoku(size=10)
-                self.status = "Player's Turn"
-                self.ai_turn = False
+        # Check for restart button click at any time
+        if self.restart_button.collidepoint(pos):
+            self.game = Gomoku(size=10)
+            self.status = "Player's Turn"
+            self.ai_turn = False
+            self.game.current_player = 1
+            self.game.game_over = False
+            self.game.winner = None
+            self.draw_board()
+            pygame.display.flip()
             return
-        x, y = pos
-        if y < self.board_size:
-            row = y // self.cell_size
-            col = x // self.cell_size
-            if self.game.make_move(row, col, 1):
-                self.status = "AI's Turn"
-                if self.game.check_winner(1, self.game.last_move):
-                    self.status = "Player Wins!"
-                    self.game.game_over = True
-                    self.game.winner = 1
-                elif self.game.is_board_full():
-                    self.status = "Draw!"
-                    self.game.game_over = True
-                else:
-                    self.ai_turn = True
-                self.draw_board()
-                pygame.display.flip()
+        
+        # Process board clicks only if not game over and player's turn
+        if not self.game.game_over:
+            x, y = pos
+            if y < self.board_size:
+                row = y // self.cell_size
+                col = x // self.cell_size
+                if self.game.make_move(row, col, 1):
+                    self.status = "AI's Turn"
+                    if self.game.check_winner(1, self.game.last_move):
+                        self.status = "Player Wins!"
+                        self.game.game_over = True
+                        self.game.winner = 1
+                    elif self.game.is_board_full():
+                        self.status = "Draw!"
+                        self.game.game_over = True
+                    else:
+                        self.ai_turn = True
+                    self.draw_board()
+                    pygame.display.flip()
 
     def ai_move(self):
         start_time = time.time()
-        move = self.game.find_best_move(depth=2)
+        move = self.game.find_best_move(depth=3)
         end_time = time.time()
         if move:
             row, col = move
@@ -424,7 +432,7 @@ class GomokuGame:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
-            if event.type == pygame.MOUSEBUTTONDOWN and self.game.current_player == 1 and not self.ai_turn:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 self.handle_click(event.pos)
         if self.ai_turn and not self.game.game_over:
             self.ai_move()
