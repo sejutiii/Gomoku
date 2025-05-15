@@ -276,7 +276,7 @@ class Gomoku:
         return moves if moves else [(self.size // 2, self.size // 2)]
 
     def minimax(self, depth, alpha, beta, maximizing_player):
-        if depth == 0 or self.check_winner(1) or self.check_winner(2) or self.is_board_full():
+        if depth == 0 or self.check_winner(1, self.last_move) or self.check_winner(2, self.last_move) or self.is_board_full():
             return self.evaluate_board()
         moves = self.get_possible_moves()
         if maximizing_player:
@@ -349,6 +349,7 @@ class GomokuGame:
         self.game = Gomoku(size=10)
         self.status = "Player's Turn"
         self.restart_button = pygame.Rect(self.screen_width - 120, self.screen_height - 80, 100, 40)
+        self.ai_turn = False
 
     def draw_board(self):
         self.screen.fill((255, 255, 255))
@@ -381,6 +382,7 @@ class GomokuGame:
             if self.restart_button.collidepoint(pos):
                 self.game = Gomoku(size=10)
                 self.status = "Player's Turn"
+                self.ai_turn = False
             return
         x, y = pos
         if y < self.board_size:
@@ -396,7 +398,9 @@ class GomokuGame:
                     self.status = "Draw!"
                     self.game.game_over = True
                 else:
-                    self.ai_move()
+                    self.ai_turn = True
+                self.draw_board()
+                pygame.display.flip()
 
     def ai_move(self):
         start_time = time.time()
@@ -413,14 +417,17 @@ class GomokuGame:
             elif self.game.is_board_full():
                 self.status = "Draw!"
                 self.game.game_over = True
+        self.ai_turn = False
 
     def update_loop(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
-            if event.type == pygame.MOUSEBUTTONDOWN and self.game.current_player == 1:
+            if event.type == pygame.MOUSEBUTTONDOWN and self.game.current_player == 1 and not self.ai_turn:
                 self.handle_click(event.pos)
+        if self.ai_turn and not self.game.game_over:
+            self.ai_move()
         self.draw_board()
         pygame.display.flip()
 
