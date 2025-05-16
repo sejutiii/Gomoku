@@ -304,7 +304,7 @@ class Gomoku:
                     break
             return min_eval
 
-    def find_best_move(self, depth = 4):
+    def find_best_move(self, depth = 3):
         # Check if AI can win immediately
         ai_win = self.check_immediate_threat(2)
         if ai_win:
