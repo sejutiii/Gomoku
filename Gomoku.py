@@ -1,4 +1,3 @@
-import pygame
 import asyncio
 import platform
 from ui import GomokuGame
