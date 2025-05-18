@@ -1,7 +1,7 @@
 # Gomoku AI with Minimax and Alpha-Beta Pruning
 
-![Gomoku Game Screenshot](./images.ss1.png) 
-![Gomoku Game Screenshot](./images.ss2.png) 
+![Gomoku Game Screenshot](./images/ss1.png) 
+![Gomoku Game Screenshot](./images/ss2.png) 
 
 A Python implementation of the classic Gomoku (Five in a Row) game with an AI opponent using the Minimax algorithm and Alpha-Beta pruning optimization. The game features a Pygame-based graphical interface.
 
