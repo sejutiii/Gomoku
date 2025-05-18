@@ -144,15 +144,21 @@ class GomokuGame:
                 pygame.draw.circle(board_surface, hover_color,
                                    (col * self.cell_size + self.cell_size // 2,
                                     row * self.cell_size + self.cell_size // 2), 25)
-        # Draw winning line if game is over
-        if self.game.game_over and self.game.winning_sequence:
-            start_pos = self.game.winning_sequence[0]
-            end_pos = self.game.winning_sequence[-1]
-            start_x = start_pos[1] * self.cell_size + self.cell_size // 2
-            start_y = start_pos[0] * self.cell_size + self.cell_size // 2
-            end_x = end_pos[1] * self.cell_size + self.cell_size // 2
-            end_y = end_pos[0] * self.cell_size + self.cell_size // 2
-            pygame.draw.line(board_surface, (255, 215, 0), (start_x, start_y), (end_x, end_y), 5)
+
+        # Draw strike-through line for winning sequence
+        if self.game.game_over and self.game.winner is not None and hasattr(self.game, 'winning_sequence'):
+            if self.game.winning_sequence and len(self.game.winning_sequence) >= 5:
+                # Get the first and last points of the winning sequence
+                start_pos = self.game.winning_sequence[0]
+                end_pos = self.game.winning_sequence[-1]
+                # Convert board coordinates to pixel coordinates (center of cells)
+                start_x = start_pos[1] * self.cell_size + self.cell_size // 2
+                start_y = start_pos[0] * self.cell_size + self.cell_size // 2
+                end_x = end_pos[1] * self.cell_size + self.cell_size // 2
+                end_y = end_pos[0] * self.cell_size + self.cell_size // 2
+                # Draw the strike-through line
+                pygame.draw.line(board_surface, (255, 0, 0), (start_x, start_y), (end_x, end_y), 5)
+
         board_surface.set_alpha(int(self.board_alpha))
         self.screen.blit(board_surface, (0, 0))
         status_text = self.status_font.render(self.status, True, self.colors["text"])
