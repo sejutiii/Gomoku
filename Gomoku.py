@@ -1,6 +1,6 @@
 import asyncio
 import platform
-from ui import GomokuGame
+from UI import GomokuGame
 
 FPS = 60
 
